@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/ariadng-metatrader-mcp-server-badge.png)](https://mseep.ai/app/ariadng-metatrader-mcp-server)
+
 # MetaTrader MCP Server
 
 [![PyPI version](https://img.shields.io/pypi/v/metatrader-mcp-server.svg?style=flat&color=blue)](https://pypi.org/project/metatrader-mcp-server/)
