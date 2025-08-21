@@ -2,6 +2,8 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/metatrader-mcp-server.svg?style=flat&color=blue)](https://pypi.org/project/metatrader-mcp-server/)
 
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/ariadng/metatrader-mcp-server)](https://archestra.ai/mcp-catalog/ariadng__metatrader-mcp-server)
+
 This is a Model Context Protocol (MCP) server built with Python to enable AI LLMs to trade using MetaTrader platform.
 
 ![MetaTrader MCP Server](https://yvkbpmmzjmfqjxusmyop.supabase.co/storage/v1/object/public/github//metatrader-mcp-server-1.png)
