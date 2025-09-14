@@ -65,6 +65,29 @@ If all is well, you can now access the tools via chat using available models, su
 
 ![Open WebUI - Chat](https://yvkbpmmzjmfqjxusmyop.supabase.co/storage/v1/object/public/github//openwebui-macos.png)
 
+---
+
+## HTTP MCP mode (custom fork)
+
+This fork adds an HTTP transport mode to the MCP CLI so you can expose the MetaTrader MCP server over HTTP (useful for remote clients or Open WebUI without the separate OpenAPI backend).
+
+Run over stdio (default behavior):
+
+```powershell
+py -m metatrader_mcp.cli --login <LOGIN> --password <PASSWORD> --server <SERVER>
+```
+
+Run over HTTP on port 8000:
+
+```powershell
+py -m metatrader_mcp.cli --login <LOGIN> --password <PASSWORD> --server <SERVER> --transport http --host 0.0.0.0 --port 8000
+```
+
+Notes:
+- Requires `uvicorn` to be installed (the CLI serves `fastmcp`'s `streamable_http_app` via uvicorn).
+- The server binds to the provided host/port; for Azure VMs, ensure the NSG and Windows Firewall allow inbound TCP 8000.
+- Security: avoid exposing publicly if unauthenticated. Restrict source IPs or front with HTTPS.
+
 ## Project Roadmap
 
 For full version checklist, see [version-checklist.md](docs/roadmap/version-checklist.md).
