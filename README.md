@@ -154,7 +154,33 @@ If your MT5 terminal is installed in a non-standard location, add the `--path` a
 
 5. Start chatting! Try: *"What's my account balance?"*
 
-#### Option B: Use with Open WebUI (For ChatGPT and other LLMs)
+#### Option B: Use with HTTP Transport (For remote clients or web-based LLMs)
+
+1. Start the MCP server with HTTP transport:
+
+```bash
+metatrader-mcp-server --transport http --login YOUR_LOGIN --password YOUR_PASSWORD --server YOUR_SERVER --host 0.0.0.0 --port 8080
+```
+
+**Optional: Specify Custom MT5 Terminal Path**
+
+If your MT5 terminal is installed in a non-standard location, add the `--path` argument:
+
+```bash
+metatrader-mcp-server --transport http --login YOUR_LOGIN --password YOUR_PASSWORD --server YOUR_SERVER --path "C:\Program Files\MetaTrader 5\terminal64.exe" --host 0.0.0.0 --port 8080
+```
+
+2. The MCP server will start with Streamable HTTP endpoint available at `http://<host>:<port>/mcp`
+
+3. Configure your MCP client to connect to the HTTP endpoint
+
+**Transport Options:**
+- `--transport stdio` (default): Use standard I/O for local MCP clients (like Claude Desktop)
+- `--transport http`: Use HTTP with Streamable HTTP transport for remote clients
+- `--host`: Host to bind to (default: 127.0.0.1)
+- `--port`: Port to listen on (default: 8000)
+
+#### Option C: Use with Open WebUI (For ChatGPT and other LLMs)
 
 1. Start the HTTP server:
 
@@ -179,6 +205,8 @@ metatrader-http-server --login YOUR_LOGIN --password YOUR_PASSWORD --server YOUR
    - Save
 
 4. Now you can use trading tools in your Open WebUI chats!
+
+**Note:** This uses the REST API interface, not the MCP protocol. For MCP over HTTP/SSE, use Option B.
 
 ---
 
@@ -351,6 +379,16 @@ The server will automatically load credentials from the `.env` file.
 ```bash
 metatrader-http-server --host 127.0.0.1 --port 9000
 ```
+
+### Securing HTTP Transport
+
+When using the MCP server with HTTP transport for remote access, consider these security measures:
+
+1. **Use HTTPS**: Configure a reverse proxy (nginx, Apache) with SSL/TLS to encrypt traffic
+2. **IP Whitelisting**: Limit connections to known IP addresses using firewall rules
+3. **Firewall**: Use firewall rules to restrict port access
+4. **Network Isolation**: Keep the server on a private network or VPN
+5. **Rate Limiting**: Use a reverse proxy to implement rate limiting and DDoS protection
 
 ### Connection Parameters
 
