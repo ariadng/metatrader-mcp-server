@@ -17,12 +17,13 @@ settings = Settings()
 # Define a lifespan handler for MT5 client lifecycle
 @asynccontextmanager
 async def lifespan(app):
-    # Load environment and support uppercase or lowercase vars
+    # Load environment variables
     load_dotenv()
-    login = os.getenv("LOGIN", os.getenv("login"))
-    password = os.getenv("PASSWORD", os.getenv("password"))
-    server = os.getenv("SERVER", os.getenv("server"))
-    path = os.getenv("PATH", os.getenv("path"))
+    # Use MT5_* variables as source of truth
+    login = os.getenv("MT5_LOGIN")
+    password = os.getenv("MT5_PASSWORD")
+    server = os.getenv("MT5_SERVER")
+    path = os.getenv("MT5_PATH")
     client = init(login, password, server, path)
     app.state.client = client
     yield
@@ -60,30 +61,35 @@ app.include_router(api_router, prefix="/api/v1", generate_unique_id_function=str
 def main():
     load_dotenv()
     parser = argparse.ArgumentParser(description="MetaTrader OpenAPI server")
-    parser.add_argument("--login", required=True, help="MT5 login")
-    parser.add_argument("--password", required=True, help="MT5 password")
-    parser.add_argument("--server", required=True, help="MT5 server address")
+    parser.add_argument("--login", type=int, default=None, help="MT5 login (or set MT5_LOGIN env var)")
+    parser.add_argument("--password", default=None, help="MT5 password (or set MT5_PASSWORD env var)")
+    parser.add_argument("--server", default=None, help="MT5 server address (or set MT5_SERVER env var)")
     parser.add_argument("--path", default=None, help="Path to MT5 terminal executable (optional, auto-detected if not provided)")
     parser.add_argument("--host", default="127.0.0.1", help="Bind host")
     parser.add_argument("--port", type=int, default=8000, help="Bind port")
     args = parser.parse_args()
-
-    # set both uppercase and lowercase env vars for CLI
-    os.environ["LOGIN"] = args.login
-    os.environ["PASSWORD"] = args.password
-    os.environ["SERVER"] = args.server
-    os.environ["login"] = args.login
-    os.environ["password"] = args.password
-    os.environ["server"] = args.server
-    if args.path:
-        os.environ["PATH"] = args.path
-        os.environ["path"] = args.path
-
+    
+    # Use CLI args if provided, otherwise fall back to environment variables
+    login = args.login or (int(os.getenv("MT5_LOGIN")) if os.getenv("MT5_LOGIN") else None) # type: ignore
+    password = args.password or os.getenv("MT5_PASSWORD")
+    server = args.server or os.getenv("MT5_SERVER")
+    path = args.path or os.getenv("MT5_PATH")
+    
+    # Set environment variables for the lifespan handler to use
+    if login:
+        os.environ["MT5_LOGIN"] = str(login)
+    if password:
+        os.environ["MT5_PASSWORD"] = password
+    if server:
+        os.environ["MT5_SERVER"] = server
+    if path:
+        os.environ["MT5_PATH"] = path
+ 
     uvicorn.run(
         "metatrader_openapi.main:app",
         host=args.host,
         port=args.port,
-        reload=True,
+        reload=False,
     )
 
 if __name__ == "__main__":

@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 import os
-import argparse
-import logging
-from dotenv import load_dotenv
-
-from mcp.server.fastmcp import FastMCP, Context
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import Optional, Union
+
+from mcp.server.fastmcp import FastMCP, Context
 
 from metatrader_mcp.utils import init, get_client
 
@@ -24,10 +21,10 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 
 	try:
 		client = init(
-			os.getenv("login"),
-			os.getenv("password"),
-			os.getenv("server"),
-			os.getenv("path")
+			os.getenv("MT5_LOGIN"),
+			os.getenv("MT5_PASSWORD"),
+			os.getenv("MT5_SERVER"),
+			os.getenv("MT5_PATH")
 		)
 		yield AppContext(client=client)
 	finally:
@@ -227,24 +224,3 @@ def cancel_pending_orders_by_symbol(ctx: Context, symbol: str) -> dict:
 	"""Cancel all pending orders for a specific symbol."""
 	client = get_client(ctx)
 	return client.order.cancel_pending_orders_by_symbol(symbol=symbol)
-
-if __name__ == "__main__":
-	load_dotenv()
-	parser = argparse.ArgumentParser(description="MetaTrader MCP Server")
-	parser.add_argument("--login",    type=str, help="MT5 login")
-	parser.add_argument("--password", type=str, help="MT5 password")
-	parser.add_argument("--server",   type=str, help="MT5 server name")
-	parser.add_argument("--path",     type=str, help="Path to MT5 terminal executable (optional)")
-
-	args = parser.parse_args()
-
-	# inject into lifespan via env vars
-	if args.login:    os.environ["login"]    = args.login
-	if args.password: os.environ["password"] = args.password
-	if args.server:   os.environ["server"]   = args.server
-	if args.path:     os.environ["path"]     = args.path
-
-	# run the MCP server (must call mcp.run)
-	mcp.run(
-		transport="stdio"
-	)
