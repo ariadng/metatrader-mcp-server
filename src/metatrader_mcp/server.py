@@ -27,7 +27,8 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 			os.getenv("login"),
 			os.getenv("password"),
 			os.getenv("server"),
-			os.getenv("path")
+			os.getenv("path"),
+			os.getenv("portable")
 		)
 		yield AppContext(client=client)
 	finally:
@@ -235,6 +236,7 @@ if __name__ == "__main__":
 	parser.add_argument("--password", type=str, help="MT5 password")
 	parser.add_argument("--server",   type=str, help="MT5 server name")
 	parser.add_argument("--path",     type=str, help="Path to MT5 terminal executable (optional)")
+	parser.add_argument("--portable",     type=str, help="MT5 terminal portable mode (optional)")
 
 	args = parser.parse_args()
 
@@ -243,6 +245,7 @@ if __name__ == "__main__":
 	if args.password: os.environ["password"] = args.password
 	if args.server:   os.environ["server"]   = args.server
 	if args.path:     os.environ["path"]     = args.path
+	if args.portable: os.environ["portable"]     = args.portable
 
 	# run the MCP server (must call mcp.run)
 	mcp.run(

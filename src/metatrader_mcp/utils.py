@@ -6,6 +6,7 @@ def init(
 	password: Optional[str],
 	server: Optional[str],
 	path: Optional[str] = None,
+	portable: Optional[str] = None
 ) -> Optional[client.MT5Client]:
 	"""
 	Initialize MT5Client
@@ -15,7 +16,7 @@ def init(
 		password (Optional[str]): Password
 		server (Optional[str]): Server name
 		path (Optional[str]): Path to MT5 terminal executable (default: None for auto-detect)
-
+		portable (Optional[bool]): MT5 in Portable Mode
 	Returns:
 		Optional[client.MT5Client]: MT5Client instance if all parameters are provided, None otherwise
 	"""
@@ -24,8 +25,11 @@ def init(
 		config = {
 			"login": int(login),
 			"password": password,
-			"server": server,
+			"server": server
 		}
+
+		if portable == "True":
+			config["portable"] = portable
 
 		# Add path to config if provided
 		if path:

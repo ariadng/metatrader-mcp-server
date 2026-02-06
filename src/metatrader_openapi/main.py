@@ -23,7 +23,8 @@ async def lifespan(app):
     password = os.getenv("PASSWORD", os.getenv("password"))
     server = os.getenv("SERVER", os.getenv("server"))
     path = os.getenv("PATH", os.getenv("path"))
-    client = init(login, password, server, path)
+    portable = os.getenv("PORTABLE", os.getenv("portable"))
+    client = init(login, password, server, path, portable)
     app.state.client = client
     yield
     if client:
