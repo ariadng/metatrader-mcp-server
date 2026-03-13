@@ -230,11 +230,16 @@ def cancel_pending_orders_by_symbol(ctx: Context, symbol: str) -> dict:
 
 if __name__ == "__main__":
 	load_dotenv()
+	from metatrader_mcp.utils import resolve_transport_config
+
 	parser = argparse.ArgumentParser(description="MetaTrader MCP Server")
 	parser.add_argument("--login",    type=str, help="MT5 login")
 	parser.add_argument("--password", type=str, help="MT5 password")
 	parser.add_argument("--server",   type=str, help="MT5 server name")
 	parser.add_argument("--path",     type=str, help="Path to MT5 terminal executable (optional)")
+	parser.add_argument("--transport", type=str, choices=["sse", "stdio", "streamable-http"], default=None, help="MCP transport type (default: sse, env: MCP_TRANSPORT)")
+	parser.add_argument("--host",     type=str, default=None, help="Host to bind for SSE/HTTP transport (default: 0.0.0.0, env: MCP_HOST)")
+	parser.add_argument("--port",     type=int, default=None, help="Port to bind for SSE/HTTP transport (default: 8080, env: MCP_PORT)")
 
 	args = parser.parse_args()
 
@@ -244,7 +249,10 @@ if __name__ == "__main__":
 	if args.server:   os.environ["server"]   = args.server
 	if args.path:     os.environ["path"]     = args.path
 
+	transport, host, port = resolve_transport_config(args.transport, args.host, args.port)
+
 	# run the MCP server (must call mcp.run)
-	mcp.run(
-		transport="stdio"
-	)
+	if transport == "stdio":
+		mcp.run(transport="stdio")
+	else:
+		mcp.run(transport=transport, host=host, port=port)

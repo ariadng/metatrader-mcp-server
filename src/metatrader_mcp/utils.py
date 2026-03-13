@@ -1,5 +1,14 @@
+import os
 from typing import Any, Optional, Union
 from metatrader_client import client
+
+
+def resolve_transport_config(transport=None, host=None, port=None):
+	"""Resolve transport config: CLI flag > env var > default."""
+	transport = transport or os.getenv("MCP_TRANSPORT", "sse")
+	host = host or os.getenv("MCP_HOST", "0.0.0.0")
+	port = port if port is not None else int(os.getenv("MCP_PORT", "8080"))
+	return transport, host, port
 
 def init(
 	login: Optional[Union[str, int]],

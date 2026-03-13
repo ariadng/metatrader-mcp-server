@@ -5,7 +5,7 @@
 MCP server enabling AI assistants to trade on MetaTrader 5 via natural language. Provides both MCP (stdio) and HTTP/REST interfaces.
 
 **Stack**: Python 3.10+ • FastMCP • FastAPI • MetaTrader5 SDK • Pandas • Pydantic • pytest
-**Version**: 0.2.9 (Beta)
+**Version**: 0.3.0 (Beta)
 **Repo**: https://github.com/ariadng/metatrader-mcp-server
 
 ---
@@ -30,7 +30,7 @@ def place_market_order(connection, *, type: str, symbol: str, volume: Union[floa
 ```
 
 ### 2. `metatrader_mcp` - MCP Server
-- FastMCP with stdio transport
+- FastMCP with SSE transport (default), STDIO fallback via `--transport stdio`
 - Tools: `@mcp.tool()` decorated functions
 - Client access: `client = get_client(ctx)`
 - Returns: CSV strings for DataFrames, dicts for objects
@@ -193,6 +193,7 @@ async def endpoint(request: Request, param: type = Body(...)):
 
 **Required**: `LOGIN`, `PASSWORD`, `SERVER`
 **Optional**: `OPENAPI_TITLE`, `OPENAPI_VERSION`
+**MCP Transport**: `MCP_TRANSPORT` (sse|stdio|streamable-http, default: sse), `MCP_HOST` (default: 0.0.0.0), `MCP_PORT` (default: 8080)
 **Debug**: Set `debug: True` in config dict
 
 ---

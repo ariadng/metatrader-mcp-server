@@ -105,7 +105,7 @@ pip install metatrader-mcp-server
 
 Pick one based on how you want to use it:
 
-#### Option A: Use with Claude Desktop (Recommended for beginners)
+#### Option A: Use with Claude Desktop (Local STDIO)
 
 1. Find your Claude Desktop config file:
    - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
@@ -119,9 +119,10 @@ Pick one based on how you want to use it:
     "metatrader": {
       "command": "metatrader-mcp-server",
       "args": [
-        "--login",    "YOUR_MT5_LOGIN",
-        "--password", "YOUR_MT5_PASSWORD",
-        "--server",   "YOUR_MT5_SERVER"
+        "--login",     "YOUR_MT5_LOGIN",
+        "--password",  "YOUR_MT5_PASSWORD",
+        "--server",    "YOUR_MT5_SERVER",
+        "--transport", "stdio"
       ]
     }
   }
@@ -138,10 +139,11 @@ If your MT5 terminal is installed in a non-standard location, add the `--path` a
     "metatrader": {
       "command": "metatrader-mcp-server",
       "args": [
-        "--login",    "YOUR_MT5_LOGIN",
-        "--password", "YOUR_MT5_PASSWORD",
-        "--server",   "YOUR_MT5_SERVER",
-        "--path",     "C:\\Program Files\\MetaTrader 5\\terminal64.exe"
+        "--login",     "YOUR_MT5_LOGIN",
+        "--password",  "YOUR_MT5_PASSWORD",
+        "--server",    "YOUR_MT5_SERVER",
+        "--transport", "stdio",
+        "--path",      "C:\\Program Files\\MetaTrader 5\\terminal64.exe"
       ]
     }
   }
@@ -179,6 +181,38 @@ metatrader-http-server --login YOUR_LOGIN --password YOUR_PASSWORD --server YOUR
    - Save
 
 4. Now you can use trading tools in your Open WebUI chats!
+
+#### Option C: Remote MCP Server (SSE)
+
+Run the MCP server on a Windows VPS (where MT5 is installed) and connect to it remotely from Claude Desktop or Claude Code.
+
+**Server-side** (on the Windows VPS):
+
+```bash
+metatrader-mcp-server --login YOUR_LOGIN --password YOUR_PASSWORD --server YOUR_SERVER
+```
+
+This starts the SSE server on `0.0.0.0:8080` by default. Customize with `--host` and `--port`:
+
+```bash
+metatrader-mcp-server --login YOUR_LOGIN --password YOUR_PASSWORD --server YOUR_SERVER --host 127.0.0.1 --port 9000
+```
+
+**Client-side** (Claude Desktop config on your local machine):
+
+```json
+{
+  "mcpServers": {
+    "metatrader": {
+      "url": "http://VPS_IP:8080/sse"
+    }
+  }
+}
+```
+
+Replace `VPS_IP` with your server's IP address.
+
+> **Security Warning**: The MCP protocol does not include authentication. When exposing the SSE server over a network, use a firewall to restrict access by IP, or place it behind a reverse proxy with authentication, or use an SSH tunnel.
 
 ---
 
@@ -346,7 +380,19 @@ metatrader-http-server
 
 The server will automatically load credentials from the `.env` file.
 
-### Custom Port and Host
+### MCP Transport Configuration
+
+The MCP server supports multiple transport modes:
+
+| Flag | Env Var | Default | Description |
+|------|---------|---------|-------------|
+| `--transport` | `MCP_TRANSPORT` | `sse` | Transport type: `sse`, `stdio`, `streamable-http` |
+| `--host` | `MCP_HOST` | `0.0.0.0` | Host to bind (SSE/HTTP only) |
+| `--port` | `MCP_PORT` | `8080` | Port to bind (SSE/HTTP only) |
+
+CLI flags take precedence over environment variables, which take precedence over defaults.
+
+### Custom Port and Host (HTTP API)
 
 ```bash
 metatrader-http-server --host 127.0.0.1 --port 9000
@@ -398,6 +444,7 @@ config = {
 | Open WebUI Integration | ✅ Complete |
 | OpenAPI Documentation | ✅ Complete |
 | PyPI Package | ✅ Published |
+| SSE Transport Support | ✅ Complete |
 | Google ADK Integration | 🚧 In Progress |
 | WebSocket Support | 📋 Planned |
 | Docker Container | 📋 Planned |
@@ -516,7 +563,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📊 Project Stats
 
-- **Version**: 0.2.9
+- **Version**: 0.3.0
 - **Python**: 3.10+
 - **License**: MIT
 - **Status**: Active Development

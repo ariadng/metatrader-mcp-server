@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "metatrader-mcp-server"
-version = "0.2.9"
+version = "0.3.0"
 authors = [
   { name = "Aria Dhanang", email = "ariadng@gmail.com" },
 ]
