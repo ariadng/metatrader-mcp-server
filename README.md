@@ -563,7 +563,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📊 Project Stats
 
-- **Version**: 0.3.1
+- **Version**: 0.3.2
 - **Python**: 3.10+
 - **License**: MIT
 - **Status**: Active Development

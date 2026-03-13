@@ -20,7 +20,7 @@ def main(login, password, server, path, transport, host, port):
     os.environ["password"] = password
     os.environ["server"] = server
     if path:
-        os.environ["path"] = path
+        os.environ["MT5_PATH"] = path
 
     transport, host, port = resolve_transport_config(transport, host, port)
     run_mcp(mcp, transport, host, port)

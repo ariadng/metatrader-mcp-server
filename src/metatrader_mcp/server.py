@@ -27,7 +27,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 			os.getenv("login"),
 			os.getenv("password"),
 			os.getenv("server"),
-			os.getenv("path")
+			os.getenv("MT5_PATH")
 		)
 		yield AppContext(client=client)
 	finally:
@@ -247,7 +247,7 @@ if __name__ == "__main__":
 	if args.login:    os.environ["login"]    = args.login
 	if args.password: os.environ["password"] = args.password
 	if args.server:   os.environ["server"]   = args.server
-	if args.path:     os.environ["path"]     = args.path
+	if args.path:     os.environ["MT5_PATH"] = args.path
 
 	transport, host, port = resolve_transport_config(args.transport, args.host, args.port)
 
