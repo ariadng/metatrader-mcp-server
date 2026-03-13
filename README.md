@@ -216,6 +216,69 @@ Replace `VPS_IP` with your server's IP address.
 
 ---
 
+## 🤖 Trading Assistant Skill (Claude Code / Claude Desktop)
+
+A pre-built **Trading Terminal Assistant** skill is included in the `claude-skill/` directory. It provides Claude with structured knowledge about all 32 trading tools, safety protocols (trade confirmation before execution), output formatting, and MetaTrader 5 domain expertise.
+
+### Installing for Claude Code
+
+**Option 1: Symlink (recommended)**
+
+Create a symlink from the standard Claude Code skills directory to `claude-skill/`:
+
+```bash
+cd metatrader-mcp-server
+mkdir -p .claude
+ln -s ../claude-skill .claude/skills
+```
+
+The skill will be auto-discovered and available as `/trading`.
+
+**Option 2: Copy**
+
+Copy the skill files into the Claude Code skills directory:
+
+```bash
+cd metatrader-mcp-server
+mkdir -p .claude/skills
+cp -r claude-skill/trading .claude/skills/trading
+```
+
+### Installing for Claude Desktop
+
+For Claude Desktop, copy the skill to the global Claude skills directory:
+
+```bash
+# macOS
+mkdir -p ~/Library/Application\ Support/Claude/skills
+cp -r claude-skill/trading ~/Library/Application\ Support/Claude/skills/trading
+
+# Windows
+mkdir "%APPDATA%\Claude\skills"
+xcopy /E claude-skill\trading "%APPDATA%\Claude\skills\trading\"
+```
+
+### What the Skill Does
+
+- **Safety**: Requires confirmation before placing trades, double confirmation for batch operations (e.g., "close all positions")
+- **Workflows**: Knows how to chain tools for complex operations (e.g., place market order then set SL/TP)
+- **Formatting**: Presents account data, positions, orders, and prices in clean terminal-style tables
+- **Domain Knowledge**: Understands MT5 order types, timeframes, symbol formats, and filling modes
+
+### Usage
+
+Once installed, invoke with `/trading` or just ask trading-related questions naturally:
+
+```
+/trading
+> Show me my account dashboard
+> Buy 0.1 lots of EURUSD with SL at 1.0800
+> Close all profitable positions
+> Show me GBPUSD H4 candles
+```
+
+---
+
 ## 💡 Usage Examples
 
 ### With Claude Desktop
