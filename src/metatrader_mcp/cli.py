@@ -2,7 +2,7 @@ import click
 import os
 from dotenv import load_dotenv
 from metatrader_mcp.server import mcp
-from metatrader_mcp.utils import resolve_transport_config
+from metatrader_mcp.utils import resolve_transport_config, run_mcp
 
 @click.command()
 @click.option("--login", required=True, type=int, help="MT5 login ID")
@@ -23,11 +23,7 @@ def main(login, password, server, path, transport, host, port):
         os.environ["path"] = path
 
     transport, host, port = resolve_transport_config(transport, host, port)
-
-    if transport == "stdio":
-        mcp.run(transport="stdio")
-    else:
-        mcp.run(transport=transport, host=host, port=port)
+    run_mcp(mcp, transport, host, port)
 
 if __name__ == "__main__":
     # pylint: disable=no-value-for-parameter

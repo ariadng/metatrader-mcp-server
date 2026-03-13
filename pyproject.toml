@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "metatrader-mcp-server"
-version = "0.3.0"
+version = "0.3.1"
 authors = [
   { name = "Aria Dhanang", email = "ariadng@gmail.com" },
 ]
@@ -40,6 +40,7 @@ dependencies = [
   "pydantic-settings>=2.8.1",
   "mcp[cli]>=1.6.0",
   "click>=8.0.0",
+  "pytz",
 ]
 
 [tool.setuptools.packages.find]

@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     docs_url: str = "/docs"
     redoc_url: str = "/redoc"
     title: str = "MetaTrader MCP API"
-    version: str = "0.3.0"
+    version: str = "0.3.1"
 
     # Load from env vars prefixed with OPENAPI_
     model_config = SettingsConfigDict(env_prefix="OPENAPI_")

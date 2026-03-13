@@ -230,7 +230,7 @@ def cancel_pending_orders_by_symbol(ctx: Context, symbol: str) -> dict:
 
 if __name__ == "__main__":
 	load_dotenv()
-	from metatrader_mcp.utils import resolve_transport_config
+	from metatrader_mcp.utils import resolve_transport_config, run_mcp
 
 	parser = argparse.ArgumentParser(description="MetaTrader MCP Server")
 	parser.add_argument("--login",    type=str, help="MT5 login")
@@ -252,7 +252,4 @@ if __name__ == "__main__":
 	transport, host, port = resolve_transport_config(args.transport, args.host, args.port)
 
 	# run the MCP server (must call mcp.run)
-	if transport == "stdio":
-		mcp.run(transport="stdio")
-	else:
-		mcp.run(transport=transport, host=host, port=port)
+	run_mcp(mcp, transport, host, port)

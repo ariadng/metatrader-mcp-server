@@ -10,6 +10,16 @@ def resolve_transport_config(transport=None, host=None, port=None):
 	port = port if port is not None else int(os.getenv("MCP_PORT", "8080"))
 	return transport, host, port
 
+
+def run_mcp(mcp, transport, host, port):
+	"""Run the MCP server with the resolved transport config."""
+	if transport == "stdio":
+		mcp.run(transport="stdio")
+	else:
+		mcp.settings.host = host
+		mcp.settings.port = port
+		mcp.run(transport=transport)
+
 def init(
 	login: Optional[Union[str, int]],
 	password: Optional[str],
