@@ -12,13 +12,32 @@
 
 **Let AI assistants trade for you using natural language**
 
-[Features](#-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Examples](#-usage-examples) • [Support](#-getting-help)
-
 ![MetaTrader MCP Server](docs/media/hero.webp)
 
 </div>
 
 <br />
+
+---
+
+## 📑 Table of Contents
+
+- [What is This?](#-what-is-this)
+- [Features](#-features)
+- [Who Is This For?](#-who-is-this-for)
+- [Important Disclaimer](#%EF%B8%8F-important-disclaimer)
+- [Prerequisites](#-prerequisites)
+- [Quick Start](#-quick-start)
+- [Trading Assistant Skill](#-trading-assistant-skill-claude-code--claude-desktop)
+- [Usage Examples](#-usage-examples)
+- [Available Operations](#-available-operations)
+- [Advanced Configuration](#-advanced-configuration)
+- [Roadmap](#%EF%B8%8F-roadmap)
+- [Development](#%EF%B8%8F-development)
+- [Contributing](#-contributing)
+- [Documentation](#-documentation)
+- [Getting Help](#-getting-help)
+- [License](#-license)
 
 ---
 
@@ -218,7 +237,7 @@ Replace `VPS_IP` with your server's IP address.
 
 ## 🤖 Trading Assistant Skill (Claude Code / Claude Desktop)
 
-A pre-built **Trading Terminal Assistant** skill is included in the `claude-skill/` directory. It provides Claude with structured knowledge about all 32 trading tools, safety protocols (trade confirmation before execution), output formatting, and MetaTrader 5 domain expertise.
+A pre-built **Trading Terminal Assistant** skill is included in the `claude-skill/` directory. It provides Claude with structured knowledge about all 32 trading tools, output formatting, and MetaTrader 5 domain expertise.
 
 ### Installing for Claude Code
 
@@ -260,7 +279,7 @@ xcopy /E claude-skill\trading "%APPDATA%\Claude\skills\trading\"
 
 ### What the Skill Does
 
-- **Safety**: Requires confirmation before placing trades, double confirmation for batch operations (e.g., "close all positions")
+- **Direct Execution**: Executes trades immediately when requested, no extra confirmation needed
 - **Workflows**: Knows how to chain tools for complex operations (e.g., place market order then set SL/TP)
 - **Formatting**: Presents account data, positions, orders, and prices in clean terminal-style tables
 - **Domain Knowledge**: Understands MT5 order types, timeframes, symbol formats, and filling modes
