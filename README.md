@@ -31,6 +31,7 @@
 - [Trading Assistant Skill](#-trading-assistant-skill-claude-code--claude-desktop)
 - [Usage Examples](#-usage-examples)
 - [Available Operations](#-available-operations)
+- [WebSocket Quote Server](#-websocket-quote-server)
 - [Advanced Configuration](#-advanced-configuration)
 - [Roadmap](#%EF%B8%8F-roadmap)
 - [Development](#%EF%B8%8F-development)
@@ -65,7 +66,7 @@ You → AI Assistant → MCP Server → MetaTrader 5 → Your Trades
 - **💼 Complete Account Control** - Check balance, equity, margin, and trading statistics
 - **⚡ Order Management** - Place, modify, and close orders with simple commands
 - **🔒 Secure** - All credentials stay on your machine
-- **🌐 Flexible Interfaces** - Use as MCP server or REST API
+- **🌐 Flexible Interfaces** - Use as MCP server, REST API, or WebSocket stream
 - **📖 Well Documented** - Comprehensive guides and examples
 
 ## 🎯 Who Is This For?
@@ -201,7 +202,23 @@ metatrader-http-server --login YOUR_LOGIN --password YOUR_PASSWORD --server YOUR
 
 4. Now you can use trading tools in your Open WebUI chats!
 
-#### Option C: Remote MCP Server (SSE)
+#### Option C: Real-Time Quotes via WebSocket
+
+Stream live tick data (bid, ask, spread, volume) over WebSocket for dashboards, bots, or monitoring:
+
+```bash
+metatrader-quote-server --login YOUR_LOGIN --password YOUR_PASSWORD --server YOUR_SERVER
+```
+
+Connect with any WebSocket client:
+
+```bash
+websocat ws://localhost:8765
+```
+
+You'll receive a `connected` message followed by continuous tick updates as JSON. See [WebSocket Quote Server](#-websocket-quote-server) for full details.
+
+#### Option D: Remote MCP Server (SSE)
 
 Run the MCP server on a Windows VPS (where MT5 is installed) and connect to it remotely from Claude Desktop or Claude Code.
 
@@ -295,6 +312,85 @@ Once installed, invoke with `/trading` or just ask trading-related questions nat
 > Close all profitable positions
 > Show me GBPUSD H4 candles
 ```
+
+---
+
+## 📡 WebSocket Quote Server
+
+The WebSocket Quote Server streams real-time tick data from MetaTrader 5 to any WebSocket client. It's ideal for live dashboards, algorithmic trading frontends, and real-time monitoring.
+
+### Starting the Server
+
+```bash
+metatrader-quote-server --login YOUR_LOGIN --password YOUR_PASSWORD --server YOUR_SERVER
+```
+
+The server starts on `ws://0.0.0.0:8765` by default.
+
+### Customization
+
+```bash
+metatrader-quote-server \
+  --login YOUR_LOGIN \
+  --password YOUR_PASSWORD \
+  --server YOUR_SERVER \
+  --host 127.0.0.1 \
+  --port 9000 \
+  --symbols "EURUSD,GBPUSD,XAUUSD" \
+  --poll-interval 200
+```
+
+### Configuration
+
+| Flag | Env Var | Default | Description |
+|------|---------|---------|-------------|
+| `--host` | `QUOTE_HOST` | `0.0.0.0` | Host to bind |
+| `--port` | `QUOTE_PORT` | `8765` | Port to bind |
+| `--symbols` | `QUOTE_SYMBOLS` | `XAUUSD,USOIL,GBPUSD,USDJPY,EURUSD,BTCUSD` | Comma-separated symbols to stream |
+| `--poll-interval` | `QUOTE_POLL_INTERVAL_MS` | `100` | Tick polling interval in milliseconds |
+
+CLI flags take precedence over environment variables, which take precedence over defaults.
+
+### Message Format
+
+**On connect** — server sends a `connected` message with the symbol list, followed by any cached ticks:
+```json
+{"type": "connected", "symbols": ["XAUUSD", "EURUSD", "GBPUSD"], "poll_interval_ms": 100}
+```
+
+**Tick updates** — sent whenever bid, ask, or volume changes:
+```json
+{"type": "tick", "symbol": "XAUUSD", "bid": 2345.67, "ask": 2345.89, "spread": 0.22, "volume": 1234, "time": "2026-03-14T10:30:45+00:00"}
+```
+
+**Errors** — sent if a symbol cannot be fetched:
+```json
+{"type": "error", "symbol": "INVALID", "message": "Symbol not found or data unavailable"}
+```
+
+### Example: Connecting with Python
+
+```python
+import asyncio
+import json
+from websockets.asyncio.client import connect
+
+async def main():
+    async with connect("ws://localhost:8765") as ws:
+        async for message in ws:
+            tick = json.loads(message)
+            if tick["type"] == "tick":
+                print(f"{tick['symbol']}: {tick['bid']}/{tick['ask']} (spread: {tick['spread']})")
+
+asyncio.run(main())
+```
+
+### Design Notes
+
+- **Change detection**: Only broadcasts when bid, ask, or volume actually changes, reducing unnecessary traffic.
+- **Late joiners**: New clients receive cached ticks immediately on connect, so they don't have to wait for the next change.
+- **MT5 thread safety**: All MT5 SDK calls are serialized through a single-thread executor to prevent concurrent access issues.
+- **Multiple clients**: Any number of WebSocket clients can connect simultaneously.
 
 ---
 
@@ -528,7 +624,7 @@ config = {
 | PyPI Package | ✅ Published |
 | SSE Transport Support | ✅ Complete |
 | Google ADK Integration | 🚧 In Progress |
-| WebSocket Support | 📋 Planned |
+| WebSocket Quote Server | ✅ Complete |
 | Docker Container | 📋 Planned |
 
 ---
@@ -565,7 +661,8 @@ metatrader-mcp-server/
 │   │   ├── order/              # Order execution
 │   │   └── types/              # Type definitions
 │   ├── metatrader_mcp/         # MCP server implementation
-│   └── metatrader_openapi/     # HTTP/REST API server
+│   ├── metatrader_openapi/     # HTTP/REST API server
+│   └── metatrader_quote/       # WebSocket quote streamer
 ├── tests/                      # Test suite
 ├── docs/                       # Documentation
 └── pyproject.toml             # Project configuration

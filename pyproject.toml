@@ -41,11 +41,12 @@ dependencies = [
   "mcp[cli]>=1.6.0",
   "click>=8.0.0",
   "pytz",
+  "websockets>=13.0",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["metatrader_mcp*", "metatrader_client*", "metatrader_openapi*"]
+include = ["metatrader_mcp*", "metatrader_client*", "metatrader_openapi*", "metatrader_quote*"]
 
 [project.urls]
 "Homepage" = "https://github.com/ariadng/metatrader-mcp-server"
@@ -57,3 +58,4 @@ client = []
 [project.scripts]
 "metatrader-mcp-server" = "metatrader_mcp.cli:main"
 "metatrader-http-server" = "metatrader_openapi.main:main"
+"metatrader-quote-server" = "metatrader_quote.cli:main"
