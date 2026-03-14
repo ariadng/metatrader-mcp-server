@@ -40,6 +40,8 @@ class QuoteServer:
         self._poll_interval = poll_interval_ms / 1000.0
         self._clients: Set[ServerConnection] = set()
         self._last_ticks: Dict[str, Dict[str, Any]] = {}
+        self._symbol_digits: Dict[str, int] = {}
+        self._symbol_points: Dict[str, float] = {}
         self._executor = ThreadPoolExecutor(max_workers=1)
 
     async def _handler(self, websocket: ServerConnection) -> None:
@@ -88,10 +90,30 @@ class QuoteServer:
             or last.get("volume") != tick.get("volume")
         )
 
+    def _load_symbol_meta(self) -> None:
+        """Load static symbol metadata (digits, point) from MT5."""
+        for symbol in self._symbols:
+            try:
+                info = self._client.market.get_symbol_info(symbol)
+                self._symbol_digits[symbol] = info.get("digits", 5)
+                self._symbol_points[symbol] = info.get("point", 0.00001)
+                logger.info(
+                    "Symbol %s: digits=%d, point=%s",
+                    symbol, self._symbol_digits[symbol], self._symbol_points[symbol],
+                )
+            except Exception as e:
+                self._symbol_digits[symbol] = 5
+                self._symbol_points[symbol] = 0.00001
+                logger.warning("Could not get metadata for %s, using defaults: %s", symbol, e)
+
     def _fetch_tick(self, symbol: str) -> Optional[Dict[str, Any]]:
-        """Fetch tick data for a symbol (runs in executor thread)."""
+        """Fetch tick data and point values for a symbol (runs in executor thread)."""
         try:
-            return self._client.market.get_symbol_price(symbol)
+            tick = self._client.market.get_symbol_price(symbol)
+            info = self._client.market.get_symbol_info(symbol)
+            tick["trade_tick_value_profit"] = info.get("trade_tick_value_profit", 0)
+            tick["trade_tick_value_loss"] = info.get("trade_tick_value_loss", 0)
+            return tick
         except Exception as e:
             logger.warning("Error fetching %s: %s", symbol, e)
             return None
@@ -127,14 +149,23 @@ class QuoteServer:
 
                 bid = tick_data.get("bid", 0)
                 ask = tick_data.get("ask", 0)
-                spread = round(ask - bid, 10)
+                digits = self._symbol_digits.get(symbol, 5)
+                point = self._symbol_points.get(symbol, 0.00001)
+                spread = round(ask - bid, digits)
+                spread_points = round(spread / point) if point > 0 else 0
 
                 tick_msg = {
                     "type": "tick",
                     "symbol": symbol,
                     "bid": bid,
                     "ask": ask,
+                    "bid_string": f"{bid:.{digits}f}",
+                    "ask_string": f"{ask:.{digits}f}",
                     "spread": spread,
+                    "spread_string": f"{spread:.{digits}f}",
+                    "spread_points": spread_points,
+                    "buy_point_value": tick_data.get("trade_tick_value_profit", 0),
+                    "sell_point_value": tick_data.get("trade_tick_value_loss", 0),
                     "volume": tick_data.get("volume", 0),
                     "time": time_str,
                 }
@@ -154,5 +185,7 @@ class QuoteServer:
             ", ".join(self._symbols),
             int(self._poll_interval * 1000),
         )
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(self._executor, self._load_symbol_meta)
         async with serve(self._handler, self._host, self._port):
             await self._poll_ticks()
