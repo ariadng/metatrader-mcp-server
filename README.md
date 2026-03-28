@@ -547,7 +547,7 @@ PASSWORD=your_password
 SERVER=MetaQuotes-Demo
 
 # Optional: Specify custom MT5 terminal path (auto-detected if not provided)
-# PATH=C:\Program Files\MetaTrader 5\terminal64.exe
+# MT5_PATH=C:\Program Files\MetaTrader 5\terminal64.exe
 ```
 
 Then start the server without arguments:

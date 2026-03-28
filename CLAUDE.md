@@ -192,7 +192,7 @@ async def endpoint(request: Request, param: type = Body(...)):
 ## Environment Variables
 
 **Required**: `LOGIN`, `PASSWORD`, `SERVER`
-**Optional**: `OPENAPI_TITLE`, `OPENAPI_VERSION`
+**Optional**: `MT5_PATH` (path to MT5 terminal executable, auto-detected if not set), `OPENAPI_TITLE`, `OPENAPI_VERSION`
 **MCP Transport**: `MCP_TRANSPORT` (sse|stdio|streamable-http, default: sse), `MCP_HOST` (default: 0.0.0.0), `MCP_PORT` (default: 8080)
 **Debug**: Set `debug: True` in config dict
 
