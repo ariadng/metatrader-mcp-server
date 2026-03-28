@@ -56,8 +56,8 @@ async def get_candles_by_date_endpoint( # Choose a descriptive name
         df = client.market.get_candles_by_date(
             symbol_name=symbol_name,
             timeframe=timeframe,
-            date_from=date_from,
-            date_to=date_to
+            from_date=date_from,
+            to_date=date_to
         )
         if df is None or df.empty:
             # Return empty list if no data, or handle as appropriate
