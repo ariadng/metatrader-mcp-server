@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 import pandas as pd
 from datetime import datetime, timezone, timedelta
 import MetaTrader5 as mt5
@@ -10,8 +10,8 @@ def get_candles_by_date(
     connection,
     symbol_name: str,
     timeframe: str,
-    from_date: Optional[str] = None,
-    to_date: Optional[str] = None,
+    from_date: Optional[Union[str, datetime]] = None,
+    to_date: Optional[Union[str, datetime]] = None,
 ) -> pd.DataFrame:
     if not get_symbols(connection, symbol_name):
         raise SymbolNotFoundError(f"Symbol '{symbol_name}' not found")
@@ -21,6 +21,10 @@ def get_candles_by_date(
     from_datetime = None
     to_datetime = None
     def parse_date(date_str, is_to_date=False):
+        if isinstance(date_str, datetime):
+            if date_str.tzinfo is None:
+                return date_str.replace(tzinfo=timezone.utc)
+            return date_str
         for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d"):
             try:
                 dt = datetime.strptime(date_str, fmt)

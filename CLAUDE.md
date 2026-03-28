@@ -5,7 +5,7 @@
 MCP server enabling AI assistants to trade on MetaTrader 5 via natural language. Provides both MCP (stdio) and HTTP/REST interfaces.
 
 **Stack**: Python 3.10+ • FastMCP • FastAPI • MetaTrader5 SDK • Pandas • Pydantic • pytest
-**Version**: 0.5.0 (Beta)
+**Version**: 0.5.1 (Beta)
 **Repo**: https://github.com/ariadng/metatrader-mcp-server
 
 ---
