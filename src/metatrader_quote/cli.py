@@ -33,14 +33,17 @@ def main(login, password, server, path, host, port, symbols, poll_interval):
     # CLI flags override settings
     host = host or settings.host
     port = port if port is not None else settings.port
-    symbols_str = symbols or settings.symbols
     poll_interval_ms = poll_interval if poll_interval is not None else settings.poll_interval_ms
-
-    symbol_list = [s.strip() for s in symbols_str.split(",") if s.strip()]
 
     client = init(login=login, password=password, server=server, path=path)
     if client is None:
         raise click.ClickException("Failed to initialize MT5 client. Check credentials.")
+
+    if symbols:
+        symbol_list = [s.strip() for s in symbols.split(",") if s.strip()]
+    else:
+        symbol_list = client.market.get_symbols()
+        logger.info("Streaming all %d available symbols", len(symbol_list))
 
     try:
         quote_server = QuoteServer(
