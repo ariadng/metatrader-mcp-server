@@ -758,3 +758,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 [PyPI](https://pypi.org/project/metatrader-mcp-server/) • [GitHub](https://github.com/ariadng/metatrader-mcp-server) • [Issues](https://github.com/ariadng/metatrader-mcp-server/issues)
 
 </div>
+
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/ariadng-metatrader-mcp-server).
+
